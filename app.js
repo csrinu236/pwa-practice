@@ -21,6 +21,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 const installBtn = document.querySelector('.install-btn');
+const fetchBtn = document.querySelector('.fetch-btn');
 
 installBtn.addEventListener('click', () => {
   console.log('CLICKED');
@@ -39,4 +40,20 @@ installBtn.addEventListener('click', () => {
       defferedPromt = null;
     });
   }
+});
+
+fetchBtn.addEventListener('click', async () => {
+  const data = await fetch('https://jsonplaceholder.typicode.com/posts').then(
+    (resp) => resp.json()
+  );
+  const DOMSting = data.map(({ title, body }) => {
+    return `<div class="card single-post">
+            <h4>${title}</h4>
+            <p class="mb-0">
+              ${body}
+            </p>
+          </div>`;
+  });
+  const postsContainer = document.querySelector('.posts-container');
+  postsContainer.innerHTML = DOMSting;
 });
