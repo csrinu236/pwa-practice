@@ -20,12 +20,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
   defferedPromt = e;
   installBtn.disabled = false;
 
-  //   console.log({ defferedPromt });
-  installBtn.addEventListener('click', () => {
-    console.log('CLICKED');
-    if (defferedPromt) {
+  if (defferedPromt) {
+    installBtn.addEventListener('click', () => {
+      console.log('CLICKED');
       defferedPromt.prompt();
-
       defferedPromt.userChoice.then((choiceResult) => {
         // if (choiceResult.outcome === 'accepted') {
         //   console.log('User accepted the install prompt');
@@ -37,10 +35,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
         }
         defferedPromt = null;
       });
-    }
-  });
-
-  return false;
+    });
+  }
 });
 
 const fetchBtn = document.querySelector('.fetch-btn');
