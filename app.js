@@ -9,6 +9,8 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+const installBtn = document.querySelector('.install-btn');
+installBtn.disabled = true;
 let defferedPromt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -16,31 +18,32 @@ window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
 
   defferedPromt = e;
-  console.log({ defferedPromt });
+  installBtn.disabled = false;
+
+  //   console.log({ defferedPromt });
+  installBtn.addEventListener('click', () => {
+    console.log('CLICKED');
+    if (defferedPromt) {
+      defferedPromt.prompt();
+
+      defferedPromt.userChoice.then((choiceResult) => {
+        // if (choiceResult.outcome === 'accepted') {
+        //   console.log('User accepted the install prompt');
+        // }
+        if (choiceResult.outcome === 'dismissed') {
+          console.log('DISMISSED');
+        } else {
+          console.log('APP ADDED TO HOME SCREEN');
+        }
+        defferedPromt = null;
+      });
+    }
+  });
+
   return false;
 });
 
-const installBtn = document.querySelector('.install-btn');
 const fetchBtn = document.querySelector('.fetch-btn');
-
-installBtn.addEventListener('click', () => {
-  console.log('CLICKED');
-  if (defferedPromt) {
-    defferedPromt.prompt();
-
-    defferedPromt.userChoice.then((choiceResult) => {
-      // if (choiceResult.outcome === 'accepted') {
-      //   console.log('User accepted the install prompt');
-      // }
-      if (choiceResult.outcome === 'dismissed') {
-        console.log('DISMISSED');
-      } else {
-        console.log('APP ADDED TO HOME SCREEN');
-      }
-      defferedPromt = null;
-    });
-  }
-});
 
 fetchBtn.addEventListener('click', async () => {
   const data = await fetch('https://jsonplaceholder.typicode.com/posts').then(
