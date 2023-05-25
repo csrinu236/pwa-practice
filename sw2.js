@@ -148,43 +148,43 @@ self.addEventListener('fetch', (e) => {
 // Here we don't do things in sw.js. App.js is enough
 
 // app.js
-// const url = 'https://jsonplaceholder.typicode.com/posts';
-// let fetchRespFound = false;
+const url = 'https://jsonplaceholder.typicode.com/posts';
+let fetchRespFound = false;
 
-// fetch(url) // offloading it to browser, control instantly goes to
-//   .then((resp) => {
-//     return resp.json();
-//   })
-//   .then((data) => {
-//     console.log('From web..', { data });
-//     fetchRespFound = true;
-//     // We already mentioned we should not cache json data
-//     // Solution: Simply sniff fetch event and cache there like we already seen.
-//     // update UI with data
-//   });
+fetch(url) // offloading it to browser, control instantly goes to
+  .then((resp) => {
+    return resp.json();
+  })
+  .then((data) => {
+    console.log('From web..', { data });
+    fetchRespFound = true;
+    // We already mentioned we should not cache json data
+    // Solution: Simply sniff fetch event and cache there like we already seen.
+    // update UI with data
+  });
 
-// if ('caches' in window) {
-//   caches
-//     .match(url)
-//     .then((cacheResp) => {
-//       if (cacheResp) {
-//         return cacheResp.json();
-//       }
-//     })
-//     .then((data) => {
-//       console.log('From cache..', { data });
-//       // Fetch response is always updated and if net speed very high and if
-//       // network response is fatser than cache response, we should update UI
-//       // with network response only
-//       if (!fetchRespFound) {
-//         // Update UI
-//       }
-//     });
-// }
+if ('caches' in window) {
+  caches
+    .match(url)
+    .then((cacheResp) => {
+      if (cacheResp) {
+        return cacheResp.json();
+      }
+    })
+    .then((data) => {
+      console.log('From cache..', { data });
+      // Fetch response is always updated and if net speed very high and if
+      // network response is fatser than cache response, we should update UI
+      // with network response only
+      if (!fetchRespFound) {
+        // Update UI
+      }
+    });
+}
 
-// // sw.js
-// self.addEventListener('fetch', (e) => {
-//   console.log('[Service Worker] Service Worker fetching...', e);
+// sw.js
+self.addEventListener('fetch', (e) => {
+  console.log('[Service Worker] Service Worker fetching...', e);
   // e.request is acting like a key
   // return e.respondWith(
   //   caches.open('dynamic').then((cache) => {
@@ -246,4 +246,4 @@ self.addEventListener('fetch', (e) => {
   //   })
   // );
   // }
-// });
+});

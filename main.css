@@ -193,6 +193,26 @@ img {
   max-width: 30rem;
   margin-bottom: 0.5rem;
 }
-.btn-container{
-    margin-bottom: 2rem;
+.btn-container {
+  margin-bottom: 2rem;
+}
+
+#player,
+#canvas,
+.blob-image {
+  width: 320px;
+  height: 220px;
+  border-radius: var(--radius);
+  border: 2px solid var(--clr-grey-7);
+  display: none;
+  margin-bottom: 2rem;
+  object-fit: cover;
+}
+
+.blob-container,
+.canvas-container {
+  border: unset;
+  object-fit: unset;
+  margin-bottom: 2rem;
+  display: none;
 }

@@ -40,11 +40,13 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 const fetchBtn = document.querySelector('.fetch-btn');
+// This is for manually saved data to cache on demand
+const manualSaveBtn = document.querySelector('.manual-save');
 
 fetchBtn.addEventListener('click', async () => {
-  const data = await fetch('https://jsonplaceholder.typicode.com/posts').then(
-    (resp) => resp.json()
-  );
+  const data = await fetch(
+    'https://jsonplaceholder.typicode.com/posts?userId=2'
+  ).then((resp) => resp.json());
   const DOMSting = data.map(({ title, body }) => {
     return `<div class="card single-post">
             <h4>${title}</h4>
@@ -55,4 +57,14 @@ fetchBtn.addEventListener('click', async () => {
   });
   const postsContainer = document.querySelector('.posts-container');
   postsContainer.innerHTML = DOMSting;
+});
+
+
+// This is for manually saved data to cache on demand
+manualSaveBtn.addEventListener('click', () => {
+  if ('caches' in window) {
+    caches.open('manual-save').then((cacheObj) => {
+      cacheObj.add('/manifest.json');
+    });
+  }
 });
