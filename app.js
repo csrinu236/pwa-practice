@@ -84,8 +84,12 @@ notificationsBtn.addEventListener('click', () => {
 
 function displayNotification() {
   if ('serviceWorker' in navigator) {
+    // we can also set images in notifications like youtube thumbnails
+    // we can also set icons in notifications
     const options = {
       body: 'working body',
+      icon: '/icons/manifest-icon-192.maskable.png',
+      image: '/icons/manifest-icon-512.maskable.png',
     };
     navigator.serviceWorker.ready.then((swReg) => {
       swReg.showNotification('Successfully subscribed!', options);
