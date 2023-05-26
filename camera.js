@@ -3,6 +3,10 @@ const canvasElement = document.querySelector('#canvas');
 const cameraBtn = document.querySelector('.camera-btn');
 const captureBtn = document.querySelector('.capture-btn');
 const locationBtn = document.querySelector('.location-btn');
+const postBtn = document.querySelector('.post-btn');
+const cityName = document.querySelector('.city');
+const countryName = document.querySelector('.country');
+let FD;
 
 captureBtn.disabled = true;
 
@@ -31,11 +35,10 @@ cameraBtn.addEventListener('click', async () => {
 
 captureBtn.addEventListener('click', async () => {
   //   captureBtn.disabled = true;
-  const blobContainer = document.querySelector('.blob-container');
   const canvasContainer = document.querySelector('.canvas-container');
-  const img = canvasContainer.querySelector('img');
-  canvasElement.style.display = 'block';
-  canvasContainer.style.display = 'block';
+  //   const normalContainer = document.querySelector('.normal-container');
+  //   const normalImg = document.querySelector('.normal-img');
+
   //   blobContainer.style.display = 'block';
   //   blobContainer.querySelector('h3').innerHTML = 'Blob Image Loading...';
   //   canvasElement.getContext('2d').drawImage(player, 0, 0, 320, 240);
@@ -48,6 +51,18 @@ captureBtn.addEventListener('click', async () => {
       canvasElement.height = imageBitmap.height;
       canvasElement.getContext('2d').drawImage(imageBitmap, 0, 0);
       const dataURL = canvasElement.toDataURL('image/jpeg', 1.0);
+      const blob = dataURItoBlob(dataURL);
+      FD = new FormData();
+      FD.append('userImage', blob);
+      console.log(FD.get('userImage'));
+      // var file = new File([blob], 'canvasImage.jpg', { type: 'image/jpeg' });
+      // console.log(file);
+
+      //   normalImg.src = dataURL;
+      canvasElement.style.display = 'block';
+      canvasContainer.style.display = 'block';
+      //   normalImg.style.display = 'block';
+      //   normalContainer.style.display = 'block';
     })
     .catch((error) => console.error('grabFrame() error:', error));
 
@@ -83,3 +98,59 @@ captureBtn.addEventListener('click', async () => {
 //   }
 //   return new Blob([u8arr], { type: mime });
 // }
+
+function dataURItoBlob(dataURI) {
+  // convert base64/URLEncoded data component to raw binary data held in a string
+  var byteString;
+  if (dataURI.split(',')[0].indexOf('base64') >= 0)
+    byteString = atob(dataURI.split(',')[1]);
+  else byteString = unescape(dataURI.split(',')[1]);
+
+  // separate out the mime component
+  var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+  // write the bytes of the string to a typed array
+  var ia = new Uint8Array(byteString.length);
+  for (var i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+
+  return new Blob([ia], { type: mimeString });
+}
+
+locationBtn.addEventListener('click', () => {
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords: { latitude, longitude } }) => {
+        console.log({ latitude, longitude });
+        const url = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`;
+        const { countryName: country, city } = await fetch(url).then((resp) =>
+          resp.json()
+        );
+        cityName.innerHTML = `City: <b>${city}</b>`;
+        countryName.innerHTML = `City: <b>${country}</b>`;
+        FD.append('countryName', country);
+        FD.append('cityName', city);
+        console.log(FD);
+      },
+      (error) => {},
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  }
+});
+
+postBtn.addEventListener('click', () => {
+  url = 'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
+  const plainFormData = Object.fromEntries(FD.entries());
+  const formDataJsonString = JSON.stringify(plainFormData);
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(formDataJsonString),
+  })
+    .then((resp) => resp.json())
+    .then((data) => console.log(data));
+});

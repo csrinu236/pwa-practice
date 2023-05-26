@@ -10,21 +10,30 @@
   <body>
     <div class="section">
       <div class="section-center">
+        <div class="btn-container">
+          <button class="btn camera-btn">Open Camera</button>
+          <button class="btn capture-btn">Capture</button>
+
+          <button class="btn location-btn">Get Location</button>
+          <button class="btn post-btn">Submit your Post</button>
+        </div>
+
         <video autoplay id="player"></video>
         <!-- <div class="blob-container">
           <h3>High Clarity Image</h3>
           <img class="blob-image" alt="blob-image" />
         </div> -->
+        <!-- <div class="normal-container">
+          <h3>Normal Image Tag</h3>
+          <img class="normal-img" alt="normal-img" />
+        </div> -->
         <div class="canvas-container">
-          <img alt="canvas-img" />
-          <h3>Low clarity Image</h3>
+          <h3>Canvas Image</h3>
           <canvas id="canvas" width="320px" height="220px"></canvas>
+          <h3>Location:</h3>
+          <h4 class="mb-0 city"></h4>
+          <h4 class="mb-0 country"></h4>
         </div>
-        <button class="btn camera-btn">Open Camera</button>
-        <button class="btn capture-btn">Capture</button>
-        <br />
-        <br />
-        <button class="btn location-btn">Get Location</button>
       </div>
     </div>
   </body>

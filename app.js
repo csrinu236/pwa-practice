@@ -10,6 +10,7 @@ if ('serviceWorker' in navigator) {
 }
 
 const installBtn = document.querySelector('.install-btn');
+const notificationsBtn = document.querySelector('.enable-notifications');
 installBtn.disabled = true;
 let defferedPromt;
 
@@ -59,12 +60,35 @@ fetchBtn.addEventListener('click', async () => {
   postsContainer.innerHTML = DOMSting;
 });
 
-
 // This is for manually saved data to cache on demand
 manualSaveBtn.addEventListener('click', () => {
   if ('caches' in window) {
     caches.open('manual-save').then((cacheObj) => {
-      cacheObj.add('/manifest.json');
+      //   cacheObj.add('/manifest.json');
     });
   }
 });
+
+notificationsBtn.addEventListener('click', () => {
+  if ('Notification' in window) {
+    Notification.requestPermission((result) => {
+      console.log('Users choice ', result);
+      if (result !== 'granted') {
+        console.log('Notifications permission not granted');
+      } else {
+        displayNotification();
+      }
+    });
+  }
+});
+
+function displayNotification() {
+  if ('serviceWorker' in navigator) {
+    const options = {
+      body: 'working body',
+    };
+    navigator.serviceWorker.ready.then((swReg) => {
+      swReg.showNotification('Successfully subscribed!', options);
+    });
+  }
+}
