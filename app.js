@@ -86,10 +86,15 @@ function displayNotification() {
   if ('serviceWorker' in navigator) {
     // we can also set images in notifications like youtube thumbnails
     // we can also set icons in notifications
+    // badge is top icon on main desktop screen only showed in android devices
     const options = {
       body: 'working body',
       icon: '/icons/manifest-icon-192.maskable.png',
       image: '/icons/manifest-icon-512.maskable.png',
+      dir: 'ltr',
+      lang: 'en-IN',
+      vibrate: [200, 100, 300],
+      badge: '/icons/manifest-icon-192.maskable.png',
     };
     navigator.serviceWorker.ready.then((swReg) => {
       swReg.showNotification('Successfully subscribed!', options);
