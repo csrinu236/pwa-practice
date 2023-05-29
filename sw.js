@@ -1,3 +1,14 @@
+importScripts('/idb.js');
+importScripts('/utils.js');
+
+// const dbPromise = idb.open('posts-store', 1, (db) => {
+//   // db we, got access to database object here
+//   if (!db.objectStoreNames.contains('posts')) {
+//     db.createObjectStore('posts', { keyPath: 'id' });
+//   }
+//   // id is useful to find single object in that databse
+// });
+
 self.addEventListener('install', (e) => {
   console.log('[Service Worker] installing Service Worker', e);
   // don't offload this task and go to bottom first cache
@@ -7,6 +18,7 @@ self.addEventListener('install', (e) => {
     caches.open('static').then((cache) => {
       console.log('[Service Worker] Pre caching app shell');
       cache.add('/index.html');
+      cache.add('/idb.js');
       cache.add('/offline.html');
       cache.add('/main.css');
       cache.add('/app.js');
@@ -37,56 +49,56 @@ self.addEventListener('activate', (e) => {
   return self.clients.claim();
 });
 
-self.addEventListener('fetch', (e) => {
-  //   console.log('[Service Worker] Service Worker fetching...', e);
-  //   return e.respondWith(fetch(e.request));
-  //   e.request is acting like a key
+// self.addEventListener('fetch', (e) => {
+//   //   console.log('[Service Worker] Service Worker fetching...', e);
+//   //   return e.respondWith(fetch(e.request));
+//   //   e.request is acting like a key
 
-  e.respondWith(
-    caches.match(e.request).then((resp) => {
-      if (resp) {
-        // if we found the cached response, serve it.
-        // if no cache found, get it from network.
-        return resp;
-      } else {
-        return fetch(e.request)
-          .then((fetchResp) => {
-            // before serving network response, cache it and then serve it
-            return caches.open('dynamic-v2').then((cache) => {
-              cache.put(e.request.url, fetchResp.clone());
-              return fetchResp;
-            });
-          })
-          .catch((err) => {
-            // Here we should navigate user to offline.html page
-            // We need to navigate the user to the fallback.html page when
-            // the user is offline AND trying to access any html
-            // page which has NOT been cached yet (about.html)
+//   e.respondWith(
+//     caches.match(e.request).then((resp) => {
+//       if (resp) {
+//         // if we found the cached response, serve it.
+//         // if no cache found, get it from network.
+//         return resp;
+//       } else {
+//         return fetch(e.request)
+//           .then((fetchResp) => {
+//             // before serving network response, cache it and then serve it
+//             return caches.open('dynamic-v2').then((cache) => {
+//               cache.put(e.request.url, fetchResp.clone());
+//               return fetchResp;
+//             });
+//           })
+//           .catch((err) => {
+//             // Here we should navigate user to offline.html page
+//             // We need to navigate the user to the fallback.html page when
+//             // the user is offline AND trying to access any html
+//             // page which has NOT been cached yet (about.html)
 
-            return caches.open('static').then((cache) => {
-              // it will return offline.html file if the match found for about.html page
+//             return caches.open('static').then((cache) => {
+//               // it will return offline.html file if the match found for about.html page
 
-              return cache.match('/offline.html');
-              // it can also lead to another problem, if any http request fails
-              // we will get html page instead of json. So we should send cached
-              // response based on url route.
-              // Solution:
-              // if (e.request.url.indexOf('/about.html')) {
-              //   return cache.match('/offline.html');
-              // }
+//               return cache.match('/offline.html');
+// it can also lead to another problem, if any http request fails
+// we will get html page instead of json. So we should send cached
+// response based on url route.
+// Solution:
+// if (e.request.url.indexOf('/about.html')) {
+//   return cache.match('/offline.html');
+// }
 
-              // Above is only for about.html, what about remaining uncached html files ?
-              // Better Solution:
-              // if (e.request.headers.get('accept').includes('text/html')) {
-              // Here you can also add fallback images for image requests
-              //   return cache.match('/offline.html');
-              // }
-            });
-          });
-      }
-    })
-  );
-});
+// Above is only for about.html, what about remaining uncached html files ?
+// Better Solution:
+// if (e.request.headers.get('accept').includes('text/html')) {
+// Here you can also add fallback images for image requests
+//   return cache.match('/offline.html');
+// }
+//             });
+//           });
+//       }
+//     })
+//   );
+// });
 
 // Cache only strategy, Here when we are in index.html page and click on about.html
 // it won't work because we are completely blocking network requests and serving
@@ -182,9 +194,80 @@ self.addEventListener('fetch', (e) => {
 //     });
 // }
 
-// // sw.js
+// sw.js
 // self.addEventListener('fetch', (e) => {
 //   console.log('[Service Worker] Service Worker fetching...', e);
+//   // e.request is acting like a key
+//   // return e.respondWith(
+//   //   caches.open('dynamic').then((cache) => {
+//   //     return fetch(e.request).then((fetchResp) => {
+//   //       cache.put(e.request.url, fetchResp.clone());
+//   //       return fetchResp;
+//   //     });
+//   //   })
+//   // );
+//   // But this will block showing cached pages when there is no internet.
+//   // Solution, we should go with this only for some urls
+//   const url =
+//     'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
+//   if (e.request.url.indexOfurl > -1) {
+//     // this case cache first & then network later
+//     return e.respondWith(
+//       caches.open('dynamic').then((cache) => {
+//         return fetch(e.request).then((fetchResp) => {
+//           cache.put(e.request.url, fetchResp.clone());
+//           return fetchResp;
+//         });
+//       })
+//     );
+
+//     // CHECK THE NETWORK TAB AND SEE REMAINING FILES
+//     // ARE SERVED FROM SW, BUT NOT THIS URL.
+//   } else {
+//     // previous as usual case either cache or network
+//     e.respondWith(
+//       caches.match(e.request).then((resp) => {
+//         if (resp) {
+//           // if we found the cached response, serve it.
+//           // if no cache found, get it from network.
+//           return resp;
+//         } else {
+//           return fetch(e.request)
+//             .then((fetchResp) => {
+//               // before serving network response, cache it and then serve it
+//               return caches.open('dynamic-v2').then((cache) => {
+//                 cache.put(e.request.url, fetchResp.clone());
+//                 return fetchResp;
+//               });
+//             })
+//             .catch((err) => {
+//               // Here we should navigate user to offline.html page
+//               // We need to navigate the user to the fallback.html page when
+//               // the user is offline AND trying to access any html
+//               // page which has NOT been cached yet (about.html)
+
+//               return caches.open('static').then((cache) => {
+//                 // it will return offline.html file if the match found for about.html page
+//                 // return cache.match('/offline.html');
+//                 // it can also lead to another problem, if any http request fails
+//                 // we will get html page instead of json. So we should send cached
+//                 // response based on url route.
+//                 if (e.request.headers.get('accept').includes('text/html')) {
+//                   // Here you can also add fallback images for image requests
+//                   return cache.match('/offline.html');
+//                 }
+//               });
+//             });
+//         }
+//       })
+//     );
+//   }
+// });
+
+// INDEXDB
+
+self.addEventListener('fetch', (e) => {
+  console.log('[Service Worker] Service Worker fetching...', e);
   // e.request is acting like a key
   // return e.respondWith(
   //   caches.open('dynamic').then((cache) => {
@@ -196,54 +279,143 @@ self.addEventListener('fetch', (e) => {
   // );
   // But this will block showing cached pages when there is no internet.
   // Solution, we should go with this only for some urls
-  // const url = "something"
-  // if(e.request.url.indexOfurl) > -1 ){
-  //   this case cache first & then network later
-  // return e.respondWith(
-  //   caches.open('dynamic').then((cache) => {
-  //     return fetch(e.request).then((fetchResp) => {
-  //       cache.put(e.request.url, fetchResp.clone());
-  //       return fetchResp;
-  //     });
-  //   })
-  // );
+  const url =
+    'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
+  if (e.request.url.indexOf(url) > -1) {
+    // this case cache first & then network later
+    return e.respondWith(
+      fetch(e.request).then((resp) => {
+        const clonedResp = resp.clone();
+        clonedResp.json().then((data) => {
+          for (const key in data) {
+            const finalPut = {
+              ...data[key],
+              id: new Date().getTime().toString(),
+            };
+            console.log(finalPut);
+            writedata('posts', finalPut);
+            // dbPromise.then((db) => {
+            //   const tx = db.transaction('posts', 'readwrite');
+            //   const store = tx.objectStore('posts');
+            //   store.put(finalPut);
+            //   return tx.complete;
+            // });
+          }
+        });
+        return resp;
+      })
+    );
 
-  // CHECK THE NETWORK TAB AND SEE REMAINING FILES
-  // ARE SERVED FROM SW, BUT NOT THIS URL.
+    // CHECK THE NETWORK TAB AND SEE REMAINING FILES
+    // ARE SERVED FROM SW, BUT NOT THIS URL.
+  } else {
+    // previous as usual case either cache or network
+    e.respondWith(
+      caches.match(e.request).then((resp) => {
+        if (resp) {
+          // if we found the cached response, serve it.
+          // if no cache found, get it from network.
+          console.log('From Cache ', resp);
+          return resp;
+        } else {
+          return fetch(e.request)
+            .then((fetchResp) => {
+              // before serving network response, cache it and then serve it
+              return caches.open('dynamic-v2').then((cache) => {
+                cache.put(e.request.url, fetchResp.clone());
+                return fetchResp;
+              });
+            })
+            .catch((err) => {
+              // Here we should navigate user to offline.html page
+              // We need to navigate the user to the fallback.html page when
+              // the user is offline AND trying to access any html
+              // page which has NOT been cached yet (about.html)
 
-  // }else{
-  // previous as usual case either cache or network
-  // e.respondWith(
-  //   caches.match(e.request).then((resp) => {
-  //     if (resp) {
-  //       // if we found the cached response, serve it.
-  //       // if no cache found, get it from network.
-  //       return resp;
-  //     } else {
-  //       return fetch(e.request)
-  //         .then((fetchResp) => {
-  //           // before serving network response, cache it and then serve it
-  //           return caches.open('dynamic-v2').then((cache) => {
-  //             cache.put(e.request.url, fetchResp.clone());
-  //             return fetchResp;
-  //           });
-  //         })
-  //         .catch((err) => {
-  //           // Here we should navigate user to offline.html page
-  //           // We need to navigate the user to the fallback.html page when
-  //           // the user is offline AND trying to access any html
-  //           // page which has NOT been cached yet (about.html)
+              return caches.open('static').then((cache) => {
+                // it will return offline.html file if the match found for about.html page
+                // return cache.match('/offline.html');
+                // it can also lead to another problem, if any http request fails
+                // we will get html page instead of json. So we should send cached
+                // response based on url route.
+                if (e.request.headers.get('accept').includes('text/html')) {
+                  // Here you can also add fallback images for image requests
+                  return cache.match('/offline.html');
+                }
+              });
+            });
+        }
+      })
+    );
+  }
+});
 
-  //           return caches.open('static').then((cache) => {
-  //             // it will return offline.html file if the match found for about.html page
-  //             return cache.match('/offline.html');
-  //             // it can also lead to another problem, if any http request fails
-  //             // we will get html page instead of json. So we should send cached
-  //             // response based on url route.
-  //           });
-  //         });
-  //     }
-  //   })
-  // );
-  // }
-// });
+self.addEventListener('notificationclick', (e) => {
+  console.log(e);
+  const notification = e.notification;
+  const action = e.action;
+  console.log(notification);
+
+  // 3 cases
+  // 1) Directly click on notification
+  // 2) Click on Confirm
+  // 3) Click on Cancel
+  // check console.log(notification) in each case, check the timestamp as well
+
+  if (action === 'confirm') {
+    //do someting
+    notification.close(); // we should close notification icon after
+    // we click any option confirm/cancel.
+    // When clicked on any option, we should open /about.html directly on the broswer,
+    // we will check this situation later.
+  } else {
+    console.log(action);
+    notification.close();
+  }
+});
+
+self.addEventListener('notificationclose', (e) => {
+  console.log('Notification was closed...', e);
+  console.log(
+    'You can send Data Analytics when notification was closed',
+    'how long user keep the notification on the banner based on',
+    'timestamp between recieving notification and closing notification'
+  );
+});
+
+self.addEventListener('sync', (e) => {
+  if (e.tag === 'sync-new-posts') {
+    console.log('[SYNCING NEW POST]');
+    e.waitUntil(
+      readAllData('offline-posts').then((data) => {
+        console.log('SYNC MANAGER...', data);
+        const url =
+          'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
+        data.forEach(async (eachDt) => {
+          await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+            body: JSON.stringify({
+              id: eachDt.id,
+              city: eachDt.city,
+              country: eachDt.country,
+            }),
+            mode: 'no-cors',
+          })
+            .then((resp) => {
+              console.log(resp);
+              if (resp.ok) {
+                console.log('SENT DATA FROM SYNC MANAGER');
+                // clean indexedDB
+                deleteItemFromDB('offline-posts', eachDt.id);
+              }
+            })
+            .catch((err) => console.log('Error...', err));
+        });
+      })
+    );
+  }
+});

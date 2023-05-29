@@ -145,8 +145,11 @@ input {
   border: none;
   width: 100%;
   max-width: 400px;
-  padding: 0.25rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--radius);
+  margin-bottom: 1rem;
+  letter-spacing: var(--spacing);
+  font-size: 1rem;
 }
 
 .mb-0 {
@@ -235,10 +238,10 @@ img {
   margin-bottom: 2rem;
 }
 
-.location-container p{
+.location-container p {
   margin-bottom: 0;
 }
 
-:is(.city, .country) b{
+:is(.city, .country) b {
   color: var(--clr-primary-3);
 }
