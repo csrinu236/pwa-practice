@@ -9,7 +9,7 @@ submitBtn.addEventListener('click', async () => {
     console.log('SYNC MANAGER BLOCK========================>');
     navigator.serviceWorker.ready.then((swReg) => {
       const post = {
-        id: new Date().getTime().toString(),
+        id: new Date().getTime(),
         city: city.value || 'Hyderabad',
         country: country.value || 'India',
       };
