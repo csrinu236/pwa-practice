@@ -1,8 +1,20 @@
 const submitBtn = document.querySelector('.submit-btn');
+submitBtn.disabled = true;
 const fetchBtn = document.querySelector('.fetch-btn');
 const city = document.querySelector('#city');
 const country = document.querySelector('#country');
 const url = 'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
+
+function toggleSubmitBtn() {
+  if (city.value.trim() !== '' && country.value.trim() !== '') {
+    submitBtn.disabled = false;
+  } else {
+    submitBtn.disabled = true;
+  }
+}
+
+city.addEventListener('input', toggleSubmitBtn);
+country.addEventListener('input', toggleSubmitBtn);
 
 submitBtn.addEventListener('click', async () => {
   if ('serviceWorker' in navigator && 'SyncManager' in window) {
@@ -10,9 +22,13 @@ submitBtn.addEventListener('click', async () => {
     navigator.serviceWorker.ready.then((swReg) => {
       const post = {
         id: new Date().getTime(),
-        city: city.value || 'Hyderabad',
-        country: country.value || 'India',
+        city: city.value,
+        country: country.value,
       };
+      city.value = '';
+      country.value = '';
+      submitBtn.disabled = true;
+
       writedata('offline-posts', post)
         .then(() => {
           return swReg.sync.register('sync-new-posts');
@@ -23,10 +39,14 @@ submitBtn.addEventListener('click', async () => {
     });
   } else {
     const post = {
-      id: new Date().getTime().toString(),
-      city: city.value || 'Hyderabad',
-      country: country.value || 'India',
+      id: new Date().getTime(),
+      city: city.value,
+      country: country.value,
     };
+    city.value = '';
+    country.value = '';
+    submitBtn.disabled = true;
+
     const data = await fetch(url, {
       method: 'POST',
       headers: {

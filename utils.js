@@ -1,8 +1,8 @@
 const dbPromise = idb.open('posts-store', 1, (db) => {
-  // db we, got access to database object here
-  //   if (!db.objectStoreNames.contains('posts')) {
-  //     db.createObjectStore('posts', { keyPath: 'id' });
-  //   }
+  //   db we, got access to database object here
+  if (!db.objectStoreNames.contains('posts')) {
+    db.createObjectStore('posts', { keyPath: 'id' });
+  }
   if (!db.objectStoreNames.contains('offline-posts')) {
     db.createObjectStore('offline-posts', { keyPath: 'id' });
   }
@@ -26,7 +26,8 @@ const readAllData = (st) => {
   });
 };
 
-const deleteItemFromData = (st, id) => {
+const deleteItemFromDB = (st, id) => {
+  console.log('ID ID=========> ', id);
   return dbPromise.then((db) => {
     const tx = db.transaction(st, 'readwrite');
     const store = tx.objectStore(st);
