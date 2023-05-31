@@ -183,3 +183,25 @@ self.addEventListener('push', (e) => {
   // to show notification we should find, SWREG object
   e.waitUntil(self.registration.showNotification(data.title, options));
 });
+
+const props = ['name', 'email', 'tel', 'address', 'icon'];
+const opts = { multiple: true };
+
+async function getContacts() {
+  try {
+    const contacts = await navigator.contacts.select(props, opts);
+    console.log(contacts);
+  } catch (ex) {
+    // Handle any errors here.
+  }
+}
+
+const contactsBtn = document.querySelector('.contacts-btn');
+
+contactsBtn.addEventListener('click', async () => {
+  if ('contacts' in navigator) {
+    await getContacts();
+  } else {
+    alert('Contacts permission not supported');
+  }
+});

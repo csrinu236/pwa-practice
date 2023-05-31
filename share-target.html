@@ -18,38 +18,35 @@
 </html>
 
 <script>
-  // window.addEventListener('DOMContentLoaded', () => {
-  //   const parsedUrl = new URL(window.location);
-  //   // searchParams.get() will properly handle decoding the values.
-  //   console.log('Title shared: ' + parsedUrl.searchParams.get('title'));
-  //   console.log('Text shared: ' + parsedUrl.searchParams.get('text'));
-  //   console.log('URL shared: ' + parsedUrl.searchParams.get('url'));
-  //   document.querySelector('.title').innerHTML =
-  //     parsedUrl.searchParams.get('title');
-  //   document.querySelector('.text').innerHTML =
-  //     parsedUrl.searchParams.get('text');
-  //   document.querySelector('.url').innerHTML =
-  //     parsedUrl.searchParams.get('url');
-  // });
-
-  self.addEventListener('fetch', (event) => {
-    const url = new URL(event.request.url);
-    // If this is an incoming POST request for the
-    // registered "action" URL, respond to it.
-    if (
-      event.request.method === 'POST' &&
-      url.pathname === '/share-target.html'
-    ) {
-      event.respondWith(
-        (async () => {
-          const formData = await event.request.formData();
-          const link = formData.get('link') || '';
-          document.querySelector('.url').innerHTML =
-            parsedUrl.searchParams.get('url');
-          const responseUrl = await saveBookmark(link);
-          return Response.redirect(responseUrl, 303);
-        })()
-      );
-    }
+  window.addEventListener('DOMContentLoaded', () => {
+    const parsedUrl = new URL(window.location);
+    // searchParams.get() will properly handle decoding the values.
+    console.log('Title shared: ' + parsedUrl.searchParams.get('title'));
+    console.log('Text shared: ' + parsedUrl.searchParams.get('text'));
+    console.log('URL shared: ' + parsedUrl.searchParams.get('url'));
+    document.querySelector('.title').innerHTML =
+      parsedUrl.searchParams.get('title');
+    document.querySelector('.text').innerHTML =
+      parsedUrl.searchParams.get('text');
+    document.querySelector('.url').innerHTML =
+      parsedUrl.searchParams.get('url');
   });
+
+  // self.addEventListener('fetch', (event) => {
+  //   const url = new URL(event.request.url);
+  //   // If this is an incoming POST request for the
+  //   // registered "action" URL, respond to it.
+  //   if (event.request.method === 'POST' && url.pathname === '/share-target.html') {
+  //     event.respondWith(
+  //       (async () => {
+  //         const formData = await event.request.formData();
+  //         const link = formData.get('link') || '';
+  //         document.querySelector('.url').innerHTML =
+  //           parsedUrl.searchParams.get('url');
+  //         // const responseUrl = await saveBookmark(link);
+  //         // return Response.redirect(responseUrl, 303);
+  //       })()
+  //     );
+  //   }
+  // });
 </script>
