@@ -391,16 +391,16 @@ self.addEventListener('sync', (e) => {
         console.log('SYNC MANAGER...', data);
         for (let i = 0; i < data.length; i++) {
           console.log('ID ID ID ID: ', data[i].id);
-          const url =
-            'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
+          // const url =
+          //   'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
+          const url = 'http://localhost:3000/posts';
           fetch(url, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
+              'Content-Type': 'application/json; charset=utf-8',
             },
             body: JSON.stringify({
-              id: data[i].id,
+              // id: data[i].id,
               city: data[i].city,
               country: data[i].country,
             }),
@@ -408,11 +408,11 @@ self.addEventListener('sync', (e) => {
           })
             .then((resp) => {
               console.log(resp);
-              deleteItemFromDB('offline-posts', data[i].id);
 
               if (resp.ok) {
                 console.log('SENT DATA FROM SYNC MANAGER');
                 // clean indexedDB
+                deleteItemFromDB('offline-posts', data[i].id);
               }
             })
             .catch((err) => console.log('Error...', err));

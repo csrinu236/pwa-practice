@@ -1,5 +1,8 @@
 'use strict';
 
+// 1) Permisionn related things(wrto Apple & Android) contacts messages camera location
+// 2) Opening another app from a PWA
+
 (function () {
   function toArray(arr) {
     return Array.prototype.slice.call(arr);

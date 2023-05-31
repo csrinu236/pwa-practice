@@ -1,3 +1,5 @@
+console.warn('Waning something...');
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
     .register('/sw.js')
@@ -76,9 +78,9 @@ notificationsBtn.addEventListener('click', () => {
       if (result !== 'granted') {
         console.log('Notifications permission not granted');
       } else {
-        displayNotification(); // NOT subscription based, instead simple js click based
+        // displayNotification(); // NOT subscription based, instead simple js click based
         displaySubBasedNotification(); // It is subscription based, when some one adds a post to backend server,
-        // users get notified even if the phone is in pocket.
+        // users get notified even if the app is killed.
       }
     });
   }
@@ -113,7 +115,9 @@ function displayNotification() {
         },
       ],
     };
-    // ready is like alternative of 'install' event
+    // ready is like alternative of 'install' event,
+    // If we want to access Service Worker registration object outside of SW.JS,
+    // this method is the way.
     navigator.serviceWorker.ready.then((swReg) => {
       // we are accessing entire SWRegistration object here,
       // we can many things with this object including push notifications
@@ -156,7 +160,7 @@ function displaySubBasedNotification() {
 // 3) generate vapid keys & send push notifications => web push package
 
 self.addEventListener('push', (e) => {
-  // clearly here SUBSCRIPTION is created with a service worker,
+  // clearly here SUBSCRIPTION is created with a service worker combination,
   // and if you unregister the SW then a new SW is created and new SW can't
   // identy push notifications of subscriptions of older service worker,
   // stored in firebase
@@ -173,8 +177,8 @@ self.addEventListener('push', (e) => {
     body: data.content,
     icon: '/icons/manifest-icon-192.maskable.png',
     image: '/icons/manifest-icon-512.maskable.png',
-    // it is not recommended to send images files because webpush only
-    // accepts string data uptp 4kb only, always go with urls like this.
+    // it is not recommended to send images files because webpush, only
+    // accepts string data uptp 4kb only, always go with url strings like this.
   };
   // to show notification we should find, SWREG object
   e.waitUntil(self.registration.showNotification(data.title, options));

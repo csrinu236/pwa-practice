@@ -3,7 +3,8 @@ submitBtn.disabled = true;
 const fetchBtn = document.querySelector('.fetch-btn');
 const city = document.querySelector('#city');
 const country = document.querySelector('#country');
-const url = 'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
+// const url = 'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
+const url = 'http://localhost:3000/posts';
 
 function toggleSubmitBtn() {
   if (city.value.trim() !== '' && country.value.trim() !== '') {
@@ -39,7 +40,7 @@ submitBtn.addEventListener('click', async () => {
     });
   } else {
     const post = {
-      id: new Date().getTime(),
+      // id: new Date().getTime(),
       city: city.value,
       country: country.value,
     };
@@ -50,8 +51,7 @@ submitBtn.addEventListener('click', async () => {
     const data = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+        'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify(post),
       mode: 'no-cors',

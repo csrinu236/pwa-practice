@@ -52,6 +52,12 @@ captureBtn.addEventListener('click', async () => {
       canvasElement.getContext('2d').drawImage(imageBitmap, 0, 0);
       const dataURL = canvasElement.toDataURL('image/jpeg', 1.0);
       const blob = dataURItoBlob(dataURL);
+      // URL.createObjectURL(It can take blob or file or mediasource)
+      const url = URL.createObjectURL(blob);
+      console.log({ url });
+      const anchor = document.querySelector('.download-image');
+      anchor.href = url;
+      anchor.download = 'firstimage.jpeg';
       FD = new FormData();
       FD.append('userImage', blob);
       console.log(FD.get('userImage'));
