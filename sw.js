@@ -370,7 +370,36 @@ self.addEventListener('notificationclick', (e) => {
     // we will check this situation later.
   } else {
     console.log(action);
+    // if clicked anywhere else on notification other than confirm or cancel,
+    // we can open the app either existing one if already opened or
+    // open new one if not opened already
+    e.waitUntil(
+      clients.matchAll().then((clients) => {
+        // checking if already opened window of app
+        const openedClient = clients.find(
+          (c) => c.visibilityState === 'visible'
+        );
+        if (openedClient) {
+          // if window found open it and focus it
+          openedClient.navigate('http://localhost:8080');
+          // actually we are hard coding this local host url,
+          // lets say we have a blog post notification, we should
+          // open that page directly, we should send this url
+          // from back end itself.
+          // Sol: we should set url in the payload of backend response
+          // url is available in 'push' event, there we open notification
+          // with a data propety to send any metadata
+          // openedClient.navigate(notification.data.url);
+          openedClient.focus();
+        } else {
+          // if not found
+          openedClient.openWindow('http://localhost:8080');
+          // openedClient.navigate(notification.data.url);
+        }
+      })
+    );
     notification.close();
+    // we also have notification close event
   }
 });
 

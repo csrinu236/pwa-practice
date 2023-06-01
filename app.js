@@ -87,6 +87,9 @@ notificationsBtn.addEventListener('click', () => {
 });
 
 function displayNotification() {
+  // You can display notification without service worker as well
+  // new Notification('Successfully subscribed [from SW]!', options);
+
   if ('serviceWorker' in navigator) {
     // we can also set images in notifications like youtube thumbnails
     // we can also set icons in notifications
@@ -135,39 +138,80 @@ function displaySubBasedNotification() {
   navigator.serviceWorker.ready
     .then((swReg) => {
       reg = swReg;
+      // Checking for existing subscription on this browser device combination
       return swReg.pushManager.getSubscription();
     })
     .then((sub) => {
-      // sub has any subscriptions we have currently
-      // A new sub is always created for new browser device combination
+      // Checking for existing subscription on this browser device combination
+      // A new sub is always created if website is opened in new browser device combination
       reg.pushManager.subscribe({
         userVisibleOnly: true,
+        applicationServerKey: '',
       });
       if (sub === null) {
         // Create Subscription
+        // to create a subscription, we need public key
+        return reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          // public key here
+          // private key is stored on backend server only
+
+          // we created subscription, we return it so that it will be sent to
+          // backend server via post request
+        });
       } else {
-        //We already have a subscription
+        // We already have a subscription, we can enable for
       }
+    })
+    .then((newSub) => {
+      // newSub => a new sub created & returned from previous then block
+
+      return fetch('url', {
+        // we return fetch so that we can run another then block or we can also
+        // do then here itself.
+        method: 'POST',
+        body: JSON.stringify(anySub),
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      }).then((res) => {
+        console.log('We successfully subscribed');
+        if (res.ok) {
+          // we can also send JS displayNotification() to mention subscription
+        }
+      });
+    })
+    .catch((err) => {
+      // catch error for all the then blocks
+      console.log(err);
     });
 }
 
 // Push messages from back end server, means firebase cloud function which
 // on firebase server
 // Steps
-// 1) register a subscription and store it on back end Server
-// 2) that stored subscription has endpoint of our browser + device combination
+// 1) register a subscription on client side and send it on back
+//    end Server using post request, as soon as server recieves the request,
+//    it will parse the subscription immedietly to send push notifications
+//    to all stored subscriptions.
+// 2) that stored subscription(on back-end) has endpoint of our browser + device combination
 //    to which the server send push notification.
 // 3) generate vapid keys & send push notifications => web push package
 
 self.addEventListener('push', (e) => {
+  // Once backend server sends push notifications, they come here
+
   // clearly here SUBSCRIPTION is created with a service worker combination,
   // and if you unregister the SW then a new SW is created and new SW can't
-  // identy push notifications of subscriptions of older service worker,
+  // identifyy push notifications of subscriptions of older service worker,
   // stored in firebase
 
   let data = {
     title: 'fallback title',
     content: 'fallback content ',
+    body: 'fallback body',
+    openUrl: 'fallback open url',
   };
   if (e.data) {
     data = JSON.parse(e.data.text());
@@ -177,6 +221,10 @@ self.addEventListener('push', (e) => {
     body: data.content,
     icon: '/icons/manifest-icon-192.maskable.png',
     image: '/icons/manifest-icon-512.maskable.png',
+    // data key here is to send any metadata
+    data: {
+      url: data.openUrl,
+    },
     // it is not recommended to send images files because webpush, only
     // accepts string data uptp 4kb only, always go with url strings like this.
   };

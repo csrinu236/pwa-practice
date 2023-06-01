@@ -1,0 +1,82 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <div class="section">
+      <div class="section-center">
+        <button class="btn select-btn">select file</button>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    const selectBtn = document.querySelector('.select-btn');
+    let handle;
+    selectBtn.addEventListener('click', async () => {
+      //   Have the user select a file.
+      [handle] = await window.showOpenFilePicker();
+      // Get the File object from the handle.
+
+      const file = await handle.getFile();
+      console.log(file);
+      //   This file extends to blob interface so all blob methods like
+      //   slice(), stream(), arrayBuffer(), text() are available depending on file type
+      const content = await file.text();
+      const contents = await file.text();
+      textArea.value = contents;
+
+      // Create a FileSystemWritableFileStream to write to.
+      const writable = await handle.createWritable();
+      // Write the contents of the file to the stream.
+      await writable.write(textArea.value);
+      // Close the file and write the contents to disk.
+      await writable.close(); // saving to same file
+
+      // if you want to save to a new file
+      // handle = await window.showSaveFilePicker();
+      // save()
+    });
+
+    saveAsBtn?.addEventListener('click', async () => {
+      //   Have the user select a file.
+      [handle] = await window.showOpenFilePicker({
+        types: [
+          {
+            description: 'PDF Files',
+            accept: { 'application/pdf': ['.pdf'] },
+          },
+        ],
+      });
+      // Get the File object from the handle.
+
+      //   This file extends to blob interface so all blob methods like
+      //   slice(), stream(), arrayBuffer(), text() are available depending on file type
+      //   const content = await file.text();
+      //   console.log(content);
+      const [handle] = await window.showOpenFilePicker({
+        types: [
+          {
+            description: 'Video Files',
+            accept: { 'video/*': ['.mp4', '.webm', '.ogg'] },
+          },
+        ],
+      });
+
+      const file = await handle.getFile();
+      const url = URL.createObjectURL(file);
+
+      const videoElement = document.createElement('video');
+      videoElement.src = url;
+      videoElement.style.width = '100%';
+      videoElement.controls = true;
+      videoElement.autoplay = true;
+
+      document.body.appendChild(videoElement);
+    });
+  </script>
+</html>
