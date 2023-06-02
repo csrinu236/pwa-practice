@@ -78,8 +78,8 @@ notificationsBtn.addEventListener('click', () => {
       if (result !== 'granted') {
         console.log('Notifications permission not granted');
       } else {
-        // displayNotification(); // NOT subscription based, instead simple js click based
-        displaySubBasedNotification(); // It is subscription based, when some one adds a post to backend server,
+        displayNotification(); // NOT subscription based, instead simple js click based
+        // displaySubBasedNotification(); // It is subscription based, when some one adds a post to backend server,
         // users get notified even if the app is killed.
       }
     });
