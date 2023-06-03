@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "http-server -c-1",
+    "netlify": "netlify dev",
     "backend": "json-server --watch db.json --port 3000 -d 1500"
   },
   "keywords": [],
@@ -14,5 +15,8 @@
   "dependencies": {
     "http-server": "^14.1.1",
     "json-server": "^0.17.3"
+  },
+  "devDependencies": {
+    "netlify-cli": "^15.2.0"
   }
 }
