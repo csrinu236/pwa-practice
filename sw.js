@@ -279,9 +279,14 @@ self.addEventListener('fetch', (e) => {
   // );
   // But this will block showing cached pages when there is no internet.
   // Solution, we should go with this only for some urls
-  const url =
-    'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
-  if (e.request.url.indexOf(url) > -1) {
+  const urls = [
+    'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json',
+    
+  ];
+
+  console.log(e.request.url);
+
+  if (urls.includes(e.request.url)) {
     // this case cache first & then network later
     return e.respondWith(
       fetch(e.request).then((resp) => {
