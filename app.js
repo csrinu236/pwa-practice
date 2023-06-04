@@ -199,39 +199,40 @@ function displaySubBasedNotification() {
 //    to which the server send push notification.
 // 3) generate vapid keys & send push notifications => web push package
 
-self.addEventListener('push', (e) => {
-  // Once backend server sends push notifications, they come here
+// self.addEventListener('push', (e) => {
+//   // Once backend server sends push notifications, they come here
 
-  // clearly here SUBSCRIPTION is created with a service worker combination,
-  // and if you unregister the SW then a new SW is created and new SW can't
-  // identifyy push notifications of subscriptions of older service worker,
-  // stored in firebase
+//   // clearly here SUBSCRIPTION is created with a service worker combination,
+//   // and if you unregister the SW then a new SW is created and new SW can't
+//   // identifyy push notifications of subscriptions of older service worker,
+//   // stored in firebase
 
-  let data = {
-    title: 'fallback title',
-    content: 'fallback content ',
-    body: 'fallback body',
-    openUrl: 'fallback open url',
-  };
-  if (e.data) {
-    data = JSON.parse(e.data.text());
-    console.log(data);
-  }
+//   let data = {
+//     title: 'fallback title',
+//     content: 'fallback content ',
+//     body: 'fallback body',
+//     // openUrl: 'fallback open url',
+//   };
 
-  const options = {
-    body: data.content,
-    icon: '/icons/manifest-icon-192.maskable.png',
-    image: '/icons/manifest-icon-512.maskable.png',
-    // data key here is to send any metadata
-    data: {
-      url: data.openUrl,
-    },
-    // it is not recommended to send images files because webpush, only
-    // accepts string data upto 4kb only, always go with url strings like this.
-  };
-  // to show notification we should find, SWREG object
-  e.waitUntil(self.registration.showNotification(data.title, options));
-});
+//   if (e.data) {
+//     data = JSON.parse(e.data.json());
+//     console.log({ data });
+//   }
+
+//   const options = {
+//     body: data.content,
+//     icon: '/icons/manifest-icon-192.maskable.png',
+//     image: '/icons/manifest-icon-512.maskable.png',
+//     // data key here is to send any metadata
+//     // data: {
+//     //   url: data.openUrl,
+//     // },
+//     // it is not recommended to send images files because webpush, only
+//     // accepts string data upto 4kb only, always go with url strings like this.
+//   };
+//   // to show notification we should find, SWREG object
+//   e.waitUntil(self.registration.showNotification(data.title, options));
+// });
 
 function urlBase64ToUint8Array(base64String) {
   var padding = '='.repeat((4 - (base64String.length % 4)) % 4);

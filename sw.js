@@ -449,3 +449,27 @@ self.addEventListener('sync', (e) => {
     );
   }
 });
+
+self.addEventListener('push', (e) => {
+  let payLoad = null;
+  if (e.data) {
+    payLoad = e.data.json();
+    console.log(payLoad);
+  }
+
+  options = {
+    content: payLoad.content || 'Fallback Post Added',
+    body: payLoad.body || 'Fallback successfully subscribed',
+    icon: '/icons/manifest-icon-192.maskable.png',
+    image: '/icons/manifest-icon-512.maskable.png',
+  };
+
+  console.log('BEFORE THIS');
+  e.waitUntil(
+    self.registration
+      .showNotification(payLoad.title, options)
+      .catch((error) => {
+        console.error('Error displaying notification:', error);
+      })
+  );
+});

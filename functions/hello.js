@@ -25,12 +25,12 @@ const baseKey = 'appKJrqfuU6kZpYhP';
 
 exports.handler = async (ev, context) => {
   const data = JSON.parse(ev.body);
-  console.log(data);
   let subscriptionRecords = [];
 
   const payLoad = JSON.stringify({
     title: 'New Post',
     content: 'New Post Added',
+    body: 'successfully subscribed',
   });
 
   // getting all subscriptions to send notifications
@@ -79,7 +79,7 @@ exports.handler = async (ev, context) => {
     if (response.ok) {
       const createdRecord = await response.json();
       subscriptionRecords.forEach(({ subscription }) => {
-        console.log(subscription);
+        // console.log({ subscription });
         webpush
           .sendNotification(subscription, payLoad)
           .catch((err) => console.log(err));
@@ -114,5 +114,3 @@ exports.handler = async (ev, context) => {
   //     },
   //   };
 };
-
-function name() {}
