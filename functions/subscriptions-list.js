@@ -5,6 +5,8 @@
 
 require('dotenv').config();
 
+const fetch = require('node-fetch');
+
 const webpush = require('web-push');
 const publicVapidKey =
   'BHkecfr7PKOLoUutqDCfRu_bAcMKVx6OHCtO1807Tl_vHpd-p_L70Hxoyzcuyt-gKB2I1YIr7m2gmBHtVcsNgfM';
