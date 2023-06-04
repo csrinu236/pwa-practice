@@ -70,7 +70,7 @@ exports.handler = async (ev, context) => {
 
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: 'Error creating record' }),
+      body: JSON.stringify({ message: 'Error creating record', error }),
     };
   }
 
