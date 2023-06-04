@@ -281,7 +281,6 @@ self.addEventListener('fetch', (e) => {
   // Solution, we should go with this only for some urls
   const urls = [
     'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json',
-
   ];
 
   console.log(e.request.url);
@@ -467,6 +466,10 @@ self.addEventListener('push', (e) => {
     body: payLoad.body || 'Fallback successfully subscribed',
     icon: '/icons/manifest-icon-192.maskable.png',
     image: '/icons/manifest-icon-512.maskable.png',
+    dir: 'ltr',
+    lang: 'en-IN',
+    vibrate: [200, 100, 300],
+    badge: '/icons/manifest-icon-192.maskable.png',
   };
 
   console.log('BEFORE THIS');
