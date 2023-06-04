@@ -215,6 +215,7 @@ self.addEventListener('push', (e) => {
   };
   if (e.data) {
     data = JSON.parse(e.data.text());
+    console.log(data);
   }
 
   const options = {
@@ -226,8 +227,50 @@ self.addEventListener('push', (e) => {
       url: data.openUrl,
     },
     // it is not recommended to send images files because webpush, only
-    // accepts string data uptp 4kb only, always go with url strings like this.
+    // accepts string data upto 4kb only, always go with url strings like this.
   };
   // to show notification we should find, SWREG object
   e.waitUntil(self.registration.showNotification(data.title, options));
+});
+
+function urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  var base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+
+  var rawData = window.atob(base64);
+  var outputArray = new Uint8Array(rawData.length);
+
+  for (var i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
+const subscribeToPushNotifications = document.querySelector(
+  '.subscribe-to-push-notifications'
+);
+
+subscribeToPushNotifications.addEventListener('click', async () => {
+  const swReg = await navigator.serviceWorker.ready;
+  let existedSubcription = await swReg.pushManager.getSubscription();
+  const publicVapidKey =
+    'BHkecfr7PKOLoUutqDCfRu_bAcMKVx6OHCtO1807Tl_vHpd-p_L70Hxoyzcuyt-gKB2I1YIr7m2gmBHtVcsNgfM';
+  if (existedSubcription === null) {
+    existedSubcription = await swReg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
+    });
+    const data = await fetch('/api/subscriptions-list', {
+      method: 'POST',
+      body: JSON.stringify({
+        subscription: JSON.stringify(existedSubcription),
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then((resp) => resp.json());
+    console.log(data);
+  } else {
+    console.log('ALREADY SUBSCRIBED');
+  }
 });

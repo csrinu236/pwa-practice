@@ -437,7 +437,6 @@ self.addEventListener('sync', (e) => {
           })
             .then((resp) => {
               console.log(resp);
-
               if (resp.ok) {
                 console.log('SENT DATA FROM SYNC MANAGER');
                 // clean indexedDB

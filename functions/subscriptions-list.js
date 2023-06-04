@@ -15,7 +15,7 @@ webpush.setVapidDetails(
 );
 
 const apiKey = 'keyFlcD8VAVPmYFgZ';
-const baseKey = 'appKJrqfuU6kZpYhP';
+const baseKey = 'appghfRJKkloLxEXJ';
 
 // const Airtable = require('airtable-node');
 
@@ -26,44 +26,18 @@ const baseKey = 'appKJrqfuU6kZpYhP';
 exports.handler = async (ev, context) => {
   const data = JSON.parse(ev.body);
   console.log(data);
-  let subscriptionRecords = [];
 
-  const payLoad = JSON.stringify({
-    title: 'New Post',
-    content: 'New Post Added',
-  });
-
-  // getting all subscriptions to send notifications
-  try {
-    const subscriptionsTableBaseId = 'appghfRJKkloLxEXJ'; // subscriptions-table baseId
-    const headers = {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    };
-    subscriptionRecords = await fetch(
-      `https://api.airtable.com/v0/${subscriptionsTableBaseId}/${encodeURIComponent(
-        'subscriptions-table'
-      )}`,
-      {
-        headers,
-      }
-    )
-      .then((resp) => resp.json())
-      .then(({ records }) =>
-        records.map((eachRecord) => {
-          return { subscription: JSON.parse(eachRecord.fields.subscription) };
-        })
-      );
-  } catch (error) {
-    console.log(error);
-  }
+  //   const payLoad = JSON.stringify({
+  //     title: 'New Post',
+  //     content: 'New Post Added',
+  //   });
 
   //   const body = await airtable.list().then((resp) => resp);
 
-  // accepting post and
   const url = `https://api.airtable.com/v0/${baseKey}/${encodeURIComponent(
-    'jobs-table'
+    'subscriptions-table'
   )}`;
+
   const headers = {
     Authorization: `Bearer ${apiKey}`,
     'Content-Type': 'application/json',
@@ -78,12 +52,6 @@ exports.handler = async (ev, context) => {
 
     if (response.ok) {
       const createdRecord = await response.json();
-      subscriptionRecords.forEach(({ subscription }) => {
-        console.log(subscription);
-        webpush
-          .sendNotification(subscription, payLoad)
-          .catch((err) => console.log(err));
-      });
       return {
         statusCode: 200,
         body: JSON.stringify({
@@ -114,5 +82,3 @@ exports.handler = async (ev, context) => {
   //     },
   //   };
 };
-
-function name() {}
