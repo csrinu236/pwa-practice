@@ -3,6 +3,8 @@
 // ofcourse we set redirect to domain/.netlfiy/functions/hello
 // if entered /api/hello
 
+require('dotenv').config();
+
 const webpush = require('web-push');
 const publicVapidKey =
   'BHkecfr7PKOLoUutqDCfRu_bAcMKVx6OHCtO1807Tl_vHpd-p_L70Hxoyzcuyt-gKB2I1YIr7m2gmBHtVcsNgfM';
@@ -14,7 +16,6 @@ webpush.setVapidDetails(
   privateVapidKey
 );
 
-const apiKey = 'keyFlcD8VAVPmYFgZ';
 const baseKey = 'appKJrqfuU6kZpYhP';
 
 // const Airtable = require('airtable-node');
@@ -37,7 +38,7 @@ exports.handler = async (ev, context) => {
   try {
     const subscriptionsTableBaseId = 'appghfRJKkloLxEXJ'; // subscriptions-table baseId
     const headers = {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
       'Content-Type': 'application/json',
     };
     subscriptionRecords = await fetch(
@@ -74,6 +75,7 @@ exports.handler = async (ev, context) => {
       method: 'POST',
       headers,
       body: JSON.stringify({ fields: data }),
+      mode: 'no-cors',
     });
 
     if (response.ok) {

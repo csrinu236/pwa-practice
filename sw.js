@@ -281,7 +281,7 @@ self.addEventListener('fetch', (e) => {
   // Solution, we should go with this only for some urls
   const urls = [
     'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json',
-    
+
   ];
 
   console.log(e.request.url);
