@@ -66,7 +66,7 @@ exports.handler = async (ev, context) => {
     'jobs-table'
   )}`;
   const headers = {
-    Authorization: `Bearer ${apiKey}`,
+    Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`,
     'Content-Type': 'application/json',
   };
 
