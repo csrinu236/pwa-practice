@@ -48,6 +48,7 @@ exports.handler = async (ev, context) => {
       method: 'POST',
       headers,
       body: JSON.stringify({ fields: data }),
+      mode: 'no-cors',
     });
 
     if (response.ok) {
