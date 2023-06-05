@@ -247,11 +247,22 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
-const subscribeToPushNotifications = document.querySelector(
-  '.subscribe-to-push-notifications'
+const subscribeToPushNotificationsBtn = document.querySelector(
+  '.subscribe-to-push-notifications-btn'
 );
 
-subscribeToPushNotifications.addEventListener('click', async () => {
+navigator.serviceWorker.ready.then((swReg) => {
+  if (swReg) {
+    swReg.pushManager.getSubscription().then((existedSubcription) => {
+      console.log(existedSubcription, 'existedSubcription');
+      if (existedSubcription === null) {
+        subscribeToPushNotificationsBtn.disabled = false;
+      }
+    });
+  }
+});
+
+subscribeToPushNotificationsBtn.addEventListener('click', async () => {
   const swReg = await navigator.serviceWorker.ready;
   let existedSubcription = await swReg.pushManager.getSubscription();
   const publicVapidKey =
@@ -261,6 +272,9 @@ subscribeToPushNotifications.addEventListener('click', async () => {
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
     });
+
+    createModal('Subscribing...');
+
     const data = await fetch('/api/subscriptions-list', {
       method: 'POST',
       body: JSON.stringify({
@@ -269,9 +283,27 @@ subscribeToPushNotifications.addEventListener('click', async () => {
       headers: {
         'Content-Type': 'application/json',
       },
-    }).then((resp) => resp.json());
+    }).then((resp) => {
+      if (resp.ok) {
+        subscribeToPushNotificationsBtn.disabled = true;
+        createModal('Subscribed successfully !');
+        return resp.json();
+      }
+    });
     console.log(data);
   } else {
     console.log('ALREADY SUBSCRIBED');
   }
 });
+
+function createModal(message) {
+  const prevModalIfExisted = document.querySelector('.modal');
+  prevModalIfExisted?.remove();
+  const MODAL = document.createElement('div');
+  MODAL.setAttribute('class', 'modal');
+  MODAL.innerHTML = `<div class="modal-content">
+              <h3 class="mb-0">${message}</h3>
+            </div>`;
+  document.body.appendChild(MODAL);
+  setTimeout(() => MODAL.remove(), 1500);
+}
