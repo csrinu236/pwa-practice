@@ -274,7 +274,7 @@ self.addEventListener('fetch', (e) => {
   console.log('[Service Worker] Service Worker fetching...', e);
 
   const url = new URL(e.request.url);
-  alert(url);
+  console.log({ url, pathname: url.pathname });
   // If this is an incoming POST request for the
   // registered "action" URL, respond to it.
   if (e.request.method === 'POST' && url.pathname === '/share-target.html') {
@@ -288,7 +288,6 @@ self.addEventListener('fetch', (e) => {
         document.querySelector('.url').innerHTML = link;
         // parsedUrl.searchParams.get('url');
         // const responseUrl = await saveBookmark(link);
-        alert(link);
         return Response.redirect(responseUrl, 303);
       })()
     );
