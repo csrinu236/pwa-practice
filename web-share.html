@@ -10,7 +10,7 @@
     <div class="section">
       <div class="section-center">
         <input type="file" name="fileInput" id="fileInput" />
-        <button class="btn share-btn">Share</button>
+        <button class="btn share-btn" disabled>Share</button>
         <p>It only works in HTTPS sites</p>
       </div>
     </div>
@@ -25,6 +25,7 @@
         console.log('Selected files:', selectedFiles);
         // You can perform further processing or display the file on the page
 
+        shareBtn.disabled = false;
         shareBtn.addEventListener('click', () => {
           if (
             navigator.canShare &&
