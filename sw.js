@@ -1,6 +1,10 @@
 importScripts('/idb.js');
 importScripts('/utils.js');
 
+const STATIC = 'static_v1';
+const DYNAMIC = 'dynamic_v1';
+const MANUAL_SAVE = 'manual_save_v1';
+
 // const dbPromise = idb.open('posts-store', 1, (db) => {
 //   // db we, got access to database object here
 //   if (!db.objectStoreNames.contains('posts')) {
@@ -15,7 +19,7 @@ self.addEventListener('install', (e) => {
   // all these pages and then go for activating service worker
   e.waitUntil(
     // caches store key value pairs
-    caches.open('static').then((cache) => {
+    caches.open(STATIC).then((cache) => {
       console.log('[Service Worker] Pre caching app shell');
       cache.add('/index.html');
       cache.add('/idb.js');
@@ -33,9 +37,9 @@ self.addEventListener('activate', (e) => {
       return Promise.all(
         keyList.map((eachKey) => {
           if (
-            eachKey !== 'static' &&
-            eachKey !== 'dynamic-v2' &&
-            eachKey !== 'manual-save'
+            eachKey !== STATIC &&
+            eachKey !== DYNAMIC &&
+            eachKey !== MANUAL_SAVE
           ) {
             // we will soon find a way to automatically name newer cache
             // and deleting older cache using older cache name.
@@ -103,8 +107,8 @@ self.addEventListener('activate', (e) => {
 // Cache only strategy, Here when we are in index.html page and click on about.html
 // it won't work because we are completely blocking network requests and serving
 // only cached files if found. We should tweek it so that for some routes, network
-// responses should come and for some routes caches should be serverd
-//  based on url route.
+// responses should come and for some routes caches should be served
+// based on url route.
 
 // self.addEventListener('fetch', (e) => {
 //   console.log('[Service Worker] Service Worker fetching...', e);
@@ -336,7 +340,7 @@ self.addEventListener('fetch', (e) => {
               // the user is offline AND trying to access any html
               // page which has NOT been cached yet (about.html)
 
-              return caches.open('static').then((cache) => {
+              return caches.open(STATIC).then((cache) => {
                 // it will return offline.html file if the match found for about.html page
                 // return cache.match('/offline.html');
                 // it can also lead to another problem, if any http request fails
@@ -345,6 +349,7 @@ self.addEventListener('fetch', (e) => {
                 if (e.request.headers.get('accept').includes('text/html')) {
                   // Here you can also add fallback images for image requests
                   return cache.match('/offline.html');
+                  // we can also send this without opening static caches files
                 }
               });
             });
@@ -479,5 +484,36 @@ self.addEventListener('push', (e) => {
       .catch((error) => {
         console.error('Error displaying notification:', error);
       })
+  );
+});
+
+self.addEventListener('fetch', (e) => {
+  return e.respondWith(
+    // caches.match(e.request) returns a promise
+    // Caching Dynamic Files(like html,css,js,image files) VS Caching Dynamic Content(users
+    // post request data)
+
+    // caches.match(e.request) will search for all caches
+    // irrespective of cache names static/dynamic/static-v1/dynamic-v1
+    // so we should clear old caches otherwise those files from older cache
+    // are served because of caches.match(e.request), we clear the older cache
+    // in activate event listener of service worker.
+    caches.match(e.request).then((foundCache) => {
+      if (foundCache) {
+        return foundCache;
+      } else {
+        return fetch(e.request).then((resp) => {
+          const clonedResp = resp.clone();
+          caches.open('dynamic').then((cacheObj) => {
+            cacheObj.put(e.request.url, clonedResp);
+            // key is url, value is actual file (like app.js)
+            // localhost:8080/app.js is the key and actual app.js file is the value
+            // cache.add('/index.html') same is the case with static files
+            // localhost:8080/index.html is the key and actual index.html file is the value
+            return resp;
+          });
+        });
+      }
+    })
   );
 });

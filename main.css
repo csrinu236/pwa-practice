@@ -272,3 +272,19 @@ th {
   padding: 1rem;
   border-radius: var(--radius);
 }
+
+.download-image {
+  display: inline-block;
+  margin-bottom: 2rem;
+}
+
+textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  letter-spacing: var(--spacing);
+  padding: 1rem;
+  border: 1px solid var(--clr-grey-5);
+  border-radius: var(--radius);
+  width: 100%;
+  margin-bottom: 2rem;
+}

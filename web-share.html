@@ -1,0 +1,47 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Web Share</title>
+    <link rel="stylesheet" href="main.css" />
+  </head>
+  <body>
+    <div class="section">
+      <div class="section-center">
+        <input type="file" name="fileInput" id="fileInput" />
+        <button class="btn share-btn">Share</button>
+      </div>
+    </div>
+
+    <script>
+      const fileInput = document.querySelector('#fileInput');
+      const shareBtn = document.querySelector('.share-btn');
+      fileInput.addEventListener('change', (event) => {
+        const selectedFiles = event.target.files;
+
+        // Perform actions with the selected file
+        console.log('Selected files:', selectedFiles);
+        // You can perform further processing or display the file on the page
+
+        shareBtn.addEventListener('click', () => {
+          if (
+            navigator.canShare &&
+            navigator.canShare({ files: [...selectedFiles] })
+          ) {
+            navigator
+              .share({
+                files: selectedFiles,
+                title: 'Vacation Pictures',
+                text: 'Photos from September 27 to October 14.',
+              })
+              .then(() => console.log('Share was successful.'))
+              .catch((error) => console.log('Sharing failed', error));
+          } else {
+            console.log(`Your system doesn't support sharing files.`);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
