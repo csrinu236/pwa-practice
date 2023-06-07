@@ -272,6 +272,26 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   console.log('[Service Worker] Service Worker fetching...', e);
+
+  const url = new URL(e.request.url);
+  // If this is an incoming POST request for the
+  // registered "action" URL, respond to it.
+  if (e.request.method === 'POST' && url.pathname === '/share-target.html') {
+    e.respondWith(
+      (async () => {
+        const formData = await e.request.formData();
+        // The formData() method is used to asynchronously parse the body of
+        // the request as a FormData object. It allows you to access the form
+        // data sent in the POST request payload.
+        const link = formData.get('link') || '';
+        document.querySelector('.url').innerHTML = link;
+        // parsedUrl.searchParams.get('url');
+        // const responseUrl = await saveBookmark(link);
+        alert(link);
+        return Response.redirect(responseUrl, 303);
+      })()
+    );
+  }
   // e.request is acting like a key
   // return e.respondWith(
   //   caches.open('dynamic').then((cache) => {
@@ -487,33 +507,33 @@ self.addEventListener('push', (e) => {
   );
 });
 
-self.addEventListener('fetch', (e) => {
-  return e.respondWith(
-    // caches.match(e.request) returns a promise
-    // Caching Dynamic Files(like html,css,js,image files) VS Caching Dynamic Content(users
-    // post request data)
+// self.addEventListener('fetch', (e) => {
+//   return e.respondWith(
+//     // caches.match(e.request) returns a promise
+//     // Caching Dynamic Files(like html,css,js,image files) VS Caching Dynamic Content(users
+//     // post request data)
 
-    // caches.match(e.request) will search for all caches
-    // irrespective of cache names static/dynamic/static-v1/dynamic-v1
-    // so we should clear old caches otherwise those files from older cache
-    // are served because of caches.match(e.request), we clear the older cache
-    // in activate event listener of service worker.
-    caches.match(e.request).then((foundCache) => {
-      if (foundCache) {
-        return foundCache;
-      } else {
-        return fetch(e.request).then((resp) => {
-          const clonedResp = resp.clone();
-          caches.open('dynamic').then((cacheObj) => {
-            cacheObj.put(e.request.url, clonedResp);
-            // key is url, value is actual file (like app.js)
-            // localhost:8080/app.js is the key and actual app.js file is the value
-            // cache.add('/index.html') same is the case with static files
-            // localhost:8080/index.html is the key and actual index.html file is the value
-            return resp;
-          });
-        });
-      }
-    })
-  );
-});
+//     // caches.match(e.request) will search for all caches
+//     // irrespective of cache names static/dynamic/static-v1/dynamic-v1
+//     // so we should clear old caches otherwise those files from older cache
+//     // are served because of caches.match(e.request), we clear the older cache
+//     // in activate event listener of service worker.
+//     caches.match(e.request).then((foundCache) => {
+//       if (foundCache) {
+//         return foundCache;
+//       } else {
+//         return fetch(e.request).then((resp) => {
+//           const clonedResp = resp.clone();
+//           caches.open('dynamic').then((cacheObj) => {
+//             cacheObj.put(e.request.url, clonedResp);
+//             // key is url, value is actual file (like app.js)
+//             // localhost:8080/app.js is the key and actual app.js file is the value
+//             // cache.add('/index.html') same is the case with static files
+//             // localhost:8080/index.html is the key and actual index.html file is the value
+//             return resp;
+//           });
+//         });
+//       }
+//     })
+//   );
+// });

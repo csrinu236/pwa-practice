@@ -41,28 +41,33 @@
       parsedUrl.searchParams.get('url');
   });
 
-  self.addEventListener('fetch', (event) => {
-    const url = new URL(event.request.url);
-    // If this is an incoming POST request for the
-    // registered "action" URL, respond to it.
-    if (
-      event.request.method === 'POST' &&
-      url.pathname === '/share-target.html'
-    ) {
-      event.respondWith(
-        (async () => {
-          const formData = await event.request.formData();
-          // The formData() method is used to asynchronously parse the body of
-          // the request as a FormData object. It allows you to access the form
-          // data sent in the POST request payload.
-          const link = formData.get('link') || '';
-          document.querySelector('.url').innerHTML = link;
-          // parsedUrl.searchParams.get('url');
-          // const responseUrl = await saveBookmark(link);
-          alert(link);
-          return Response.redirect(responseUrl, 303);
-        })()
-      );
-    }
-  });
+  // self.addEventListener('fetch', (event) => {
+  //   // The URL constructor is a built-in JavaScript object that allows
+  //   // you to parse, manipulate, and access various components of a URL.
+  //   // It provides properties and methods to work with different parts
+  //   // of the URL, such as the protocol, hostname, path, query parameters,
+  //   // and more.
+  //   const url = new URL(event.request.url);
+  //   // If this is an incoming POST request for the
+  //   // registered "action" URL, respond to it.
+  //   if (
+  //     event.request.method === 'POST' &&
+  //     url.pathname === '/share-target.html'
+  //   ) {
+  //     event.respondWith(
+  //       (async () => {
+  //         const formData = await event.request.formData();
+  //         // The formData() method is used to asynchronously parse the body of
+  //         // the request as a FormData object. It allows you to access the form
+  //         // data sent in the POST request payload.
+  //         const link = formData.get('link') || '';
+  //         document.querySelector('.url').innerHTML = link;
+  //         // parsedUrl.searchParams.get('url');
+  //         // const responseUrl = await saveBookmark(link);
+  //         alert(link);
+  //         return Response.redirect(responseUrl, 303);
+  //       })()
+  //     );
+  //   }
+  // });
 </script>
