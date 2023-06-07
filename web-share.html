@@ -11,6 +11,7 @@
       <div class="section-center">
         <input type="file" name="fileInput" id="fileInput" />
         <button class="btn share-btn">Share</button>
+        <p>It only works in HTTPS sites</p>
       </div>
     </div>
 
@@ -34,6 +35,7 @@
                 files: selectedFiles,
                 title: 'Vacation Pictures',
                 text: 'Photos from September 27 to October 14.',
+                url: 'https://web.dev/',
               })
               .then(() => console.log('Share was successful.'))
               .catch((error) => console.log('Sharing failed', error));
