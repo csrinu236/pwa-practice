@@ -5,10 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <link rel="stylesheet" href="main.css" />
+    <link rel="manifest" href="manifest.json" />
   </head>
   <body>
     <div class="section">
       <div class="section-center">
+        <p>
+          In the past, only platform-specific apps could register with the
+          operating system to receive shares from other installed apps. But with
+          the Web Share Target API, installed web apps can register with the
+          underlying operating system as a share target to receive shared
+          content.
+        </p>
         <h2>Shared HTML Page</h2>
         <h3 class="title"></h3>
         <h3 class="text"></h3>
@@ -33,21 +41,28 @@
       parsedUrl.searchParams.get('url');
   });
 
-  // self.addEventListener('fetch', (event) => {
-  //   const url = new URL(event.request.url);
-  //   // If this is an incoming POST request for the
-  //   // registered "action" URL, respond to it.
-  //   if (event.request.method === 'POST' && url.pathname === '/share-target.html') {
-  //     event.respondWith(
-  //       (async () => {
-  //         const formData = await event.request.formData();
-  //         const link = formData.get('link') || '';
-  //         document.querySelector('.url').innerHTML =
-  //           parsedUrl.searchParams.get('url');
-  //         // const responseUrl = await saveBookmark(link);
-  //         // return Response.redirect(responseUrl, 303);
-  //       })()
-  //     );
-  //   }
-  // });
+  self.addEventListener('fetch', (event) => {
+    const url = new URL(event.request.url);
+    // If this is an incoming POST request for the
+    // registered "action" URL, respond to it.
+    if (
+      event.request.method === 'POST' &&
+      url.pathname === '/share-target.html'
+    ) {
+      event.respondWith(
+        (async () => {
+          const formData = await event.request.formData();
+          // The formData() method is used to asynchronously parse the body of
+          // the request as a FormData object. It allows you to access the form
+          // data sent in the POST request payload.
+          const link = formData.get('link') || '';
+          document.querySelector('.url').innerHTML = link;
+          // parsedUrl.searchParams.get('url');
+          // const responseUrl = await saveBookmark(link);
+          alert(link);
+          return Response.redirect(responseUrl, 303);
+        })()
+      );
+    }
+  });
 </script>
