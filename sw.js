@@ -272,6 +272,7 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   console.log('[Service Worker] Service Worker fetching...', e);
+  console.log('Request in Intercepted, Captain...!');
 
   const url = new URL(e.request.url);
   console.log({ url, pathname: url.pathname });
@@ -288,6 +289,7 @@ self.addEventListener('fetch', (e) => {
         document.querySelector('.url').innerHTML = link;
         // parsedUrl.searchParams.get('url');
         // const responseUrl = await saveBookmark(link);
+        const responseUrl = '/share-target.html';
         return Response.redirect(responseUrl, 303);
       })()
     );
