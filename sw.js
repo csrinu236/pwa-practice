@@ -1,7 +1,7 @@
 importScripts('/idb.js');
 importScripts('/utils.js');
 
-const STATIC = 'static_v1';
+const STATIC = 'static_v2';
 const DYNAMIC = 'dynamic_v1';
 const MANUAL_SAVE = 'manual_save_v1';
 
@@ -44,6 +44,7 @@ self.addEventListener('install', (e) => {
     caches.open(STATIC).then((cache) => {
       console.log('[Service Worker] Pre caching app shell');
       cache.add('/index.html');
+      cache.add('/about.html');
       cache.add('/idb.js');
       cache.add('/offline.html');
       cache.add('/main.css');
