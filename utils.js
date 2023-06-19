@@ -1,5 +1,7 @@
 const dbPromise = idb.open('posts-store', 1, (db) => {
-  //   db we, got access to database object here
+  // This callback fn executes whenever version 1->2->3... is changed
+  // or for the very first initial loading
+  // db we, got access to database object here
   if (!db.objectStoreNames.contains('posts')) {
     db.createObjectStore('posts', { keyPath: 'id' });
   }
@@ -15,6 +17,8 @@ const writedata = (st, data) => {
     const store = tx.objectStore(st);
     store.put(data);
     return tx.complete;
+    // returns a promise so we can chain another then block to do
+    // some other asynchronous activities
   });
 };
 
@@ -23,11 +27,12 @@ const readAllData = (st) => {
     const tx = db.transaction(st, 'readonly');
     const store = tx.objectStore(st);
     return store.getAll();
+    // returns a promise so we can chain another then block to do
+    // some other asynchronous activities
   });
 };
 
 const deleteItemFromDB = (st, id) => {
-  console.log('ID ID=========> ', id);
   return dbPromise.then((db) => {
     const tx = db.transaction(st, 'readwrite');
     const store = tx.objectStore(st);

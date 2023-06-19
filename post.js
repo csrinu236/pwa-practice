@@ -14,6 +14,10 @@ function toggleSubmitBtn() {
   }
 }
 
+navigator.serviceWorker.onmessage = function (event) {
+  console.log('Received message from service worker:', event.data);
+};
+
 city.addEventListener('input', toggleSubmitBtn);
 country.addEventListener('input', toggleSubmitBtn);
 
@@ -35,12 +39,13 @@ submitBtn.addEventListener('click', async () => {
           return swReg.sync.register('sync-new-posts');
         })
         .then((data) => {
+          console.log('post registered for SYNC');
           // update DOM
         });
     });
   } else {
     const post = {
-      // id: new Date().getTime(),
+      id: new Date().getTime(),
       city: city.value,
       country: country.value,
     };

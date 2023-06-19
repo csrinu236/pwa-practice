@@ -1,7 +1,7 @@
 importScripts('/idb.js');
 importScripts('/utils.js');
 
-const STATIC = 'static_v5';
+const STATIC = 'static_v1';
 const DYNAMIC = 'dynamic_v1';
 const MANUAL_SAVE = 'manual_save_v1';
 
@@ -275,11 +275,7 @@ self.addEventListener('fetch', (e) => {
   console.log('Request in Intercepted, Captain...!');
 
   const url = new URL(e.request.url);
-
-  // The URL constructor is a built-in JavaScript object that provides a convenient way to parse and manipulate URLs. By passing a URL string as a parameter to the URL constructor, you can create a URL object that exposes various properties and methods to access and modify different parts of the URL.
-  // Once you have created a URL object, you can use its properties and methods to retrieve information about the URL, such as the protocol, hostname, port, path, query parameters, and more. You can also modify these components if needed.
-
-  // console.log({ url, pathname: url.pathname });
+  console.log({ url, pathname: url.pathname });
   // If this is an incoming POST request for the
   // registered "action" URL, respond to it.
   if (e.request.method === 'POST' && url.pathname === '/share-target.html') {
@@ -313,7 +309,7 @@ self.addEventListener('fetch', (e) => {
     'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json',
   ];
 
-  // console.log(e.request.url);
+  console.log(e.request.url);
 
   if (urls.includes(e.request.url)) {
     // this case cache first & then network later
@@ -366,7 +362,6 @@ self.addEventListener('fetch', (e) => {
               // the user is offline AND trying to access any html
               // page which has NOT been cached yet (about.html)
 
-              // way-1 (recommended)
               return caches.open(STATIC).then((cache) => {
                 // it will return offline.html file if the match found for about.html page
                 // return cache.match('/offline.html');
@@ -381,14 +376,6 @@ self.addEventListener('fetch', (e) => {
                   // we can also send this without opening static caches files
                 }
               });
-              // way-2
-              // now it will search all the available caches(STATIC, DYNAMIC, MANUAL_SAVE)
-              // instead of only STATIC
-              if (e.request.headers.get('accept').includes('text/html')) {
-                return caches.match('/offline.html').then((cacheFound) => {
-                  return cacheFound;
-                });
-              }
             });
         }
       })
@@ -463,7 +450,9 @@ self.addEventListener('sync', (e) => {
     console.log('[SYNCING NEW POST]');
     e.waitUntil(
       readAllData('offline-posts').then((data) => {
+        console.log('SYNC MANAGER...', data);
         for (let i = 0; i < data.length; i++) {
+          console.log('ID ID ID ID: ', data[i].id);
           // const url =
           //   'https://pwa-practice-49ad4-default-rtdb.firebaseio.com/posts.json';
           const url = 'http://localhost:3000/posts';
@@ -481,24 +470,14 @@ self.addEventListener('sync', (e) => {
           })
             .then((resp) => {
               console.log(resp);
-              // self.postMessage({ data: 'POST MESSAGE FROM SERVICE WORKER' });
-
-              // Send a message to the active clients
-              self.clients.matchAll().then(function (clients) {
-                clients.forEach(function (client) {
-                  client.postMessage({
-                    data: 'Hello from the service worker!',
-                  });
-                });
-              });
-
               deleteItemFromDB('offline-posts', data[i].id);
+
               if (resp.ok) {
                 console.log('SENT DATA FROM SYNC MANAGER');
                 // clean indexedDB
               }
             })
-            .catch((err) => console.error('Error...', err));
+            .catch((err) => console.log('Error...', err));
         }
       })
     );
@@ -563,3 +542,149 @@ self.addEventListener('push', (e) => {
 //     })
 //   );
 // });
+
+self.addEventListener('fetch', (e) => {
+  if ('caches' in window) {
+    // way-1(recommended for easier understanding...)
+    e.respondWith(
+      caches.match(e.request).then((cacheFound) => {
+        return cacheFound;
+      })
+    );
+    // way-2, directly returning Promise
+    e.respondWith(caches.match(e.request));
+  }
+});
+
+self.addEventListener('fetch', (e) => {
+  // way-1
+  e.respondWith(
+    fetch(e.request).then((resp) => {
+      return resp;
+    })
+  );
+  // way-2
+  e.respondWith(fetch(e.request));
+});
+
+self.addEventListener('fetch', (e) => {
+  // way-1
+  e.respondWith(
+    fetch(e.request)
+      .then((resp) => {
+        return resp;
+      })
+      .catch((err) => {
+        caches.match(e.request).then((cacheFound) => {
+          return cacheFound;
+        });
+      })
+  );
+  // way-2;
+  e.respondWith(
+    fetch(e.request).catch((err) => {
+      caches.match(e.request).then((cacheFound) => {
+        return cacheFound;
+      });
+    })
+  );
+  // way-3;
+  e.respondWith(fetch(e.request).catch(caches.match(e.request)));
+});
+
+// app.js
+// Whenever there are fetch responses which change too often, we serve instant cached
+// response and then actual fetch response.
+const url = 'somethig';
+let fetchReceived = false;
+fetch(url)
+  .then((resp) => resp.json())
+  .then((data) => {
+    // update UI with the date
+    fetchReceived = true;
+    updateUI(data);
+    console.log(data);
+    // Q) Where do you cache this response?
+    // You can't cache this reponse HERE, you can only
+    // cache response in fetch interceptor => self.addEventListener('fetch', ()=>{})
+  });
+
+const FREQUENTLY_CHANGING_CACHE = 'frequently_changing_cache_v1';
+if ('caches' in window) {
+  caches
+    .match(url)
+    .then((cacheFound) => {
+      if (fetchReceived === false) {
+        updateUI(cacheFound); // wrong, coz it is NOT YET json response
+      }
+      return cacheFound.json(); // we need to return JSON response to next then block
+    })
+    .then((actualData) => {
+      if (fetchReceived === false) {
+        updateUI(actualData); // correct
+      }
+      updateUI(actualData);
+    });
+}
+
+// sw.js
+self.addEventListener('fetch', (e) => {
+  e.respondWith(
+    fetch(e.request).then((resp) => {
+      return caches.open(FREQUENTLY_CHANGING_CACHE).then((caches) => {
+        caches.put(e.request.url, resp.clone());
+        return resp;
+      });
+    })
+  );
+});
+
+// sw.js
+const FREQList = ['url1', 'url2', 'url3'];
+
+self.addEventListener('fetch', (e) => {
+  if (FREQList.includes(e.request.url)) {
+    e.respondWith(
+      fetch(e.request).then((resp) => {
+        return caches.open(FREQUENTLY_CHANGING_CACHE).then((caches) => {
+          caches.put(e.request.url, resp.clone());
+          return resp;
+        });
+      })
+    );
+  } else {
+    e.respondWith(
+      // we are not opening any cache so we are open to serve
+      // either from static cache or dynamic cache
+      caches.match(e.request).then((cacheFound) => {
+        if (cacheFound) {
+          return cacheFound;
+        } else {
+          return fetch(url)
+            .then((resp) => {
+              return caches.open(DYNAMIC).then((dynamicCache) => {
+                dynamicCache.put(e.request.url, resp.clone());
+                return resp;
+              });
+            })
+            .catch((err) => {
+              caches.open(STATIC).then((staticCache) => {
+                console.log(err);
+                // serve offline.html file
+                if (e.request.headers.get('accept').includes('text/html')) {
+                  // Here you can also add fallback images(like avatar/dummy image) for image requests,
+                  // but make sure you pre-cache such files
+                  return staticCache
+                    .match('/offline.html')
+                    .then((cacheFound) => {
+                      return cacheFound;
+                    });
+                  // we can also send this without opening static caches files
+                }
+              });
+            });
+        }
+      })
+    );
+  }
+});
