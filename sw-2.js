@@ -351,7 +351,7 @@ self.addEventListener('fetch', (e) => {
           return fetch(e.request)
             .then((fetchResp) => {
               // before serving network response, cache it and then serve it
-              return caches.open('dynamic-v2').then((cache) => {
+              return caches.open(DYNAMIC).then((cache) => {
                 cache.put(e.request.url, fetchResp.clone());
                 return fetchResp;
               });

@@ -1,7 +1,7 @@
 importScripts('/idb.js');
 importScripts('/utils.js');
 
-const STATIC = 'static_v5';
+const STATIC = 'static_v1';
 const DYNAMIC = 'dynamic_v1';
 const MANUAL_SAVE = 'manual_save_v1';
 
@@ -14,9 +14,31 @@ const MANUAL_SAVE = 'manual_save_v1';
 // });
 
 self.addEventListener('install', (e) => {
-  console.log('[Service Worker] installing Service Worker', e);
+  console.log('[Service Worker] installing Service Worker...', e);
   // don't offload this task and go to bottom first cache
   // all these pages and then go for activating service worker
+
+  caches.keys().then((keyList) => {
+    if (keyList.length > 0) {
+      e.waitUntil(
+        Promise.all(
+          keyList.map((eachKey) => {
+            if (
+              eachKey !== STATIC &&
+              eachKey !== DYNAMIC &&
+              eachKey !== MANUAL_SAVE
+            ) {
+              // we will soon find a way to automatically name newer cache
+              // and deleting older cache using older cache name.
+              console.log('[Service Worker] removing older cache', { eachKey });
+              return caches.delete(eachKey);
+            }
+          })
+        )
+      );
+    }
+  });
+
   e.waitUntil(
     // caches store key value pairs
     caches.open(STATIC).then((cache) => {
@@ -32,24 +54,23 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   console.log('[Service Worker] activating Service Worker', e);
-  e.waitUntil(
-    caches.keys().then((keyList) => {
-      return Promise.all(
-        keyList.map((eachKey) => {
-          if (
-            eachKey !== STATIC &&
-            eachKey !== DYNAMIC &&
-            eachKey !== MANUAL_SAVE
-          ) {
-            // we will soon find a way to automatically name newer cache
-            // and deleting older cache using older cache name.
-            console.log('[Service Worker] removing older cache', { eachKey });
-            return caches.delete(eachKey);
-          }
-        })
-      );
-    })
-  );
+  // e.waitUntil();
+  // caches.keys().then((keyList) => {
+  //   return Promise.all(
+  //     keyList.map((eachKey) => {
+  //       if (
+  //         eachKey !== STATIC &&
+  //         eachKey !== DYNAMIC &&
+  //         eachKey !== MANUAL_SAVE
+  //       ) {
+  //         // we will soon find a way to automatically name newer cache
+  //         // and deleting older cache using older cache name.
+  //         console.log('[Service Worker] removing older cache', { eachKey });
+  //         return caches.delete(eachKey);
+  //       }
+  //     })
+  //   );
+  // })
   return self.clients.claim();
 });
 
@@ -355,7 +376,7 @@ self.addEventListener('fetch', (e) => {
           return fetch(e.request)
             .then((fetchResp) => {
               // before serving network response, cache it and then serve it
-              return caches.open('dynamic-v2').then((cache) => {
+              return caches.open(DYNAMIC).then((cache) => {
                 cache.put(e.request.url, fetchResp.clone());
                 return fetchResp;
               });
