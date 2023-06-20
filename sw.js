@@ -19,6 +19,7 @@ self.addEventListener('install', (e) => {
   // all these pages and then go for activating service worker
 
   caches.keys().then((keyList) => {
+    // to remove older cache if it exists..
     if (keyList.length > 0) {
       e.waitUntil(
         Promise.all(
@@ -40,7 +41,7 @@ self.addEventListener('install', (e) => {
   });
 
   e.waitUntil(
-    // caches store key value pairs
+    // caches store key value pairs or to add new cache details
     caches.open(STATIC).then((cache) => {
       console.log('[Service Worker] Pre caching app shell');
       cache.add('/index.html');
@@ -53,8 +54,8 @@ self.addEventListener('install', (e) => {
   );
 });
 
-self.addEventListener('activate', (e) => {
-  console.log('[Service Worker] activating Service Worker', e);
+// self.addEventListener('activate', (e) => {
+  // console.log('[Service Worker] activating Service Worker', e);
   // e.waitUntil();
   // caches.keys().then((keyList) => {
   //   return Promise.all(
@@ -72,8 +73,8 @@ self.addEventListener('activate', (e) => {
   //     })
   //   );
   // })
-  return self.clients.claim();
-});
+  // return self.clients.claim();
+// });
 
 // self.addEventListener('fetch', (e) => {
 //   //   console.log('[Service Worker] Service Worker fetching...', e);

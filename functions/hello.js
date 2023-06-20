@@ -32,9 +32,9 @@ exports.handler = async (ev, context) => {
   let subscriptionRecords = [];
 
   const payLoad = JSON.stringify({
-    title: 'New Post',
+    title: 'NEW Post',
     content: 'New Post Added',
-    body: 'successfully subscribed',
+    body: data.name + ' added a new post',
   });
 
   // getting all subscriptions to send notifications
@@ -64,7 +64,7 @@ exports.handler = async (ev, context) => {
 
   //   const body = await airtable.list().then((resp) => resp);
 
-  // accepting post and
+  // accepting post and getting subscriptions lo loop over them.
   const url = `https://api.airtable.com/v0/${baseKey}/${encodeURIComponent(
     'jobs-table'
   )}`;
