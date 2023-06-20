@@ -55,25 +55,25 @@ self.addEventListener('install', (e) => {
 });
 
 // self.addEventListener('activate', (e) => {
-  // console.log('[Service Worker] activating Service Worker', e);
-  // e.waitUntil();
-  // caches.keys().then((keyList) => {
-  //   return Promise.all(
-  //     keyList.map((eachKey) => {
-  //       if (
-  //         eachKey !== STATIC &&
-  //         eachKey !== DYNAMIC &&
-  //         eachKey !== MANUAL_SAVE
-  //       ) {
-  //         // we will soon find a way to automatically name newer cache
-  //         // and deleting older cache using older cache name.
-  //         console.log('[Service Worker] removing older cache', { eachKey });
-  //         return caches.delete(eachKey);
-  //       }
-  //     })
-  //   );
-  // })
-  // return self.clients.claim();
+// console.log('[Service Worker] activating Service Worker', e);
+// e.waitUntil();
+// caches.keys().then((keyList) => {
+//   return Promise.all(
+//     keyList.map((eachKey) => {
+//       if (
+//         eachKey !== STATIC &&
+//         eachKey !== DYNAMIC &&
+//         eachKey !== MANUAL_SAVE
+//       ) {
+//         // we will soon find a way to automatically name newer cache
+//         // and deleting older cache using older cache name.
+//         console.log('[Service Worker] removing older cache', { eachKey });
+//         return caches.delete(eachKey);
+//       }
+//     })
+//   );
+// })
+// return self.clients.claim();
 // });
 
 // self.addEventListener('fetch', (e) => {
@@ -450,7 +450,9 @@ self.addEventListener('notificationclick', (e) => {
         );
         if (openedClient) {
           // if window found open it and focus it
-          openedClient.navigate('http://localhost:8080');
+          openedClient.navigate(
+            'https://pwa-practice-123.netlify.app/files.html'
+          );
           // actually we are hard coding this local host url,
           // lets say we have a blog post notification, we should
           // open that page directly, we should send this url
@@ -462,7 +464,9 @@ self.addEventListener('notificationclick', (e) => {
           openedClient.focus();
         } else {
           // if not found
-          openedClient.openWindow('http://localhost:8080');
+          openedClient.openWindow(
+            'https://pwa-practice-123.netlify.app/files.html'
+          );
           // openedClient.navigate(notification.data.url);
         }
       })
