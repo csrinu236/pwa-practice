@@ -14,8 +14,21 @@ function toggleSubmitBtn() {
   }
 }
 
+function createModal(message) {
+  const prevModalIfExisted = document.querySelector('.modal');
+  prevModalIfExisted?.remove();
+  const MODAL = document.createElement('div');
+  MODAL.setAttribute('class', 'modal');
+  MODAL.innerHTML = `<div class="modal-content">
+              <h3 class="mb-0">${message}</h3>
+            </div>`;
+  document.body.appendChild(MODAL);
+  setTimeout(() => MODAL.remove(), 1500);
+}
+
 navigator.serviceWorker.onmessage = function (event) {
   console.log('Received message from service worker:', event.data);
+  createModal(event.data.data);
 };
 
 city.addEventListener('input', toggleSubmitBtn);

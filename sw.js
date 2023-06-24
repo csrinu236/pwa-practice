@@ -1,8 +1,8 @@
 importScripts('/idb.js');
 importScripts('/utils.js');
 
-const STATIC = 'static_v2';
-const DYNAMIC = 'dynamic_v1';
+const STATIC = 'static_v4';
+const DYNAMIC = 'dynamic_v3';
 const MANUAL_SAVE = 'manual_save_v1';
 
 // const dbPromise = idb.open('posts-store', 1, (db) => {
